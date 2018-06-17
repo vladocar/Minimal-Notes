@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="user-scalable=yes, width=device-width, initial-scale=1.0"/>
+
+    <script src="vue.js"></script>
+
+    <title>Minimal Notes</title>
+
+    <link rel="icon" sizes="192x192" href="icon.png">
+
+    <style>
+        body {
+            font: 14px/1.6'Avenir', Helvetica, Arial, sans-serif;
+            background-color: #fff;
+        }
+        i {
+            font-size: 12px;
+            clear: both;
+            font-style: normal;
+            display: block;
+        }
+        h2 {
+            margin: 10px
+        }
+        #app {
+            display: flex;
+            flex-flow: column wrap;
+            margin: 0 auto;
+            height: 600px;
+            justify-content: flex-start;
+            align-content: flex-start;
+        }
+        #app>div {
+            position: relative;
+            width: 200px;
+            padding: 8px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        textarea {
+            display: block;
+            width: 200px;
+            padding: 8px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 0;
+            cursor: pointer;
+            background: transparent;
+            border: 0;
+            -webkit-appearance: none;
+        }
+        .button {
+            display: block;
+            box-sizing: content-box;
+            width: 200px;
+            padding: 8px;
+            margin: 0 10px 20px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            clear: both;
+        }
+        .close {
+            position: absolute;
+            top: 7px;
+            right: 5px;
+            font-size: 21px;
+            font-weight: bold;
+            line-height: 0.75;
+            margin: 0 2px 0 0;
+            text-shadow: 0 1px 0 #fff;
+            .opacity(.2);
+            .close: hover, .close: focus {
+                text-decoration: none;
+                cursor: pointer;
+                .opacity(.5);
+            }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+
+        <h2>{{title}}</h2>
+
+        <textarea autofocus placeholder="insert your note .." v-model="note.text"></textarea>
+
+        <button class="button" @click="addNote">Submit</button>
+
+        <div v-for="(note, index) in notes">
+            <button class="close" @click="removeNote(index)">&times;</button>
+            <i>{{note.date}}</i>
+            {{note.text}}
+        </div>
+    </div>
+    <script>
+    document.getElementById("app").style.height = document.documentElement.clientHeight + "px";
+    var app = new Vue({
+        el: '#app',
+        data: {
+            title: 'Minimal Notes',
+            note: {
+                text: '',
+                date: ''
+            },
+            notes: [{
+                text: 'Minimal Notes',
+                date: new Date(Date.now()).toLocaleString()
+            }]
+        },
+        methods: {
+            addNote() {
+                var {
+                    text, title, color
+                } = this.note
+                this.notes.push({
+                    text,
+                    date: new Date(Date.now()).toLocaleString(),
+
+                })
+            },
+            removeNote(index) {
+
+                this.$delete(this.notes, index)
+            },
+
+        },
+        mounted() {
+            if (localStorage.getItem('notes')) this.notes = JSON.parse(localStorage.getItem('notes'));
+        },
+        watch: {
+            notes: {
+                handler() {
+                    localStorage.setItem('notes', JSON.stringify(this.notes));
+                },
+                deep: true,
+            },
+        }
+    })
+    </script>
+</body>
+</html>
