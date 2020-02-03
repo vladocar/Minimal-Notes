@@ -49,7 +49,7 @@
         
         textarea {
             display: block;
-            width: 200px;
+            max-width: 200px;
             padding: 8px;
             margin: 10px;
             border: 1px solid #ccc;
@@ -161,6 +161,7 @@
                         text,
                         date: new Date(Date.now()).toLocaleString(),
                     })
+                    this.note.text = ''
                 },
                 removeNote(index) {
                     this.$delete(this.notes, index)
