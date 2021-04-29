@@ -25,7 +25,7 @@
             display: block;
         }
         h2 {
-            margin: 10px
+            margin: 10px;
         }
         #app {
             display: flex;
@@ -38,13 +38,6 @@
         #app > * {
             border-radius: 2px;
             transition: all ease 0.3s;
-        }
-        #app>div {
-            position: relative;
-            width: 200px;
-            padding: 8px;
-            margin: 10px;
-            border: 1px solid #ccc;
         }
         
         textarea {
@@ -63,6 +56,28 @@
             background: transparent;
             border: 0;
             -webkit-appearance: none;
+        }
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            border-radius: 999px 999px 999px 35px;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 999px 999px 999px 35px;
+        }
+        .noteBox {
+            position: relative;
+            width: 200px;
+            margin: 10px;
+            padding: 0;
+            border: 1px solid #ccc;
         }
         .button {
             display: block;
@@ -84,7 +99,11 @@
             display: flex;
             flex-direction: row-reverse;
             justify-content: space-between;
+            padding: 15px 10px;
             margin-bottom: 0.5em;
+        }
+        .content {
+            padding: 10px;
         }
         
         .close {
@@ -124,18 +143,22 @@
 <body>
     <div id="app">
 
-        <h2>{{title}}</h2>
+        <h2>{{title}}</h2>    
+        <input type="color" id="favcolor" name="favcolor" v-model="note.color">
 
         <textarea autofocus placeholder="insert your note .." v-model="note.text"></textarea>
 
+
         <button class="button" @click="addNote">Submit</button>
 
-        <div v-for="(note, index) in notes">
-            <div class ="top">
+        <div v-for="(note, index) in notes" class="noteBox">
+            <div class="top" :style="{ 'background-color': note.color }">
                 <button class="close" @click="removeNote(index)"></button>
-                <i>{{note.date}}</i>
+                <i>{{ note.date }}</i>
             </div>
-            {{note.text}}
+            <div class="content">
+                {{ note.text }}
+            </div>
         </div>
     </div>
     <script>
@@ -145,28 +168,28 @@
                 title: 'Minimal Notes',
                 note: {
                     text: '',
-                    date: ''
+                    date: '',
+                    color: '#fecf28'
                 },
                 notes: [{
                     text: 'Minimal Notes',
-                    date: new Date(Date.now()).toLocaleString()
+                    date: new Date(Date.now()).toLocaleString(),
+                    color: '#fecf28'
                 }]
             },
             methods: {
                 addNote() {
-                    let {
-                        text, title, color
-                    } = this.note
+                    let { text, date, color } = this.note;
                     this.notes.push({
                         text,
                         date: new Date(Date.now()).toLocaleString(),
-                    })
-                    this.note.text = ''
+                        color
+                    });
+                    this.note.text = '';
                 },
                 removeNote(index) {
-                    this.$delete(this.notes, index)
+                    this.$delete(this.notes, index);
                 },
-
             },
             mounted() {
                 if (localStorage.getItem('notes')) this.notes = JSON.parse(localStorage.getItem('notes'));
