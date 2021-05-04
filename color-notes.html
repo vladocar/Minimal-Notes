@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="user-scalable=yes, width=device-width, initial-scale=1.0" />
+
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+
+    <title>Minimal Notes</title>
+
+    <link rel="icon" sizes="192x192" href="icon.png">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Montserrat');
+
+        body {
+            font-family: "Montserrat";
+            /* font: 14px/1.6'Avenir', Helvetica, Arial, sans-serif; */
+        }
+
+        i {
+            font-size: 12px;
+            clear: both;
+            font-style: normal;
+            display: block;
+        }
+
+        h2 {
+            margin: 10px;
+        }
+
+        header>h2 {
+            display: inline;
+        }
+
+        header>a {
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        #app {
+            display: flex;
+            flex-flow: column wrap;
+            margin: 0 auto;
+            height: 600px;
+            justify-content: flex-start;
+            align-content: flex-start;
+        }
+
+        #app>* {
+            border-radius: 2px;
+            transition: all ease 0.3s;
+        }
+
+        textarea {
+            display: block;
+            max-width: 200px;
+            padding: 8px;
+            margin: 10px;
+            border: 1px solid #ccc;
+        }
+
+        textarea:focus {
+            border-color: black;
+        }
+
+        button {
+            padding: 0;
+            cursor: pointer;
+            background: transparent;
+            border: 0;
+            -webkit-appearance: none;
+        }
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            border-radius: 999px 999px 999px 35px;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            background-color: white;
+            float: right;
+        }
+
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 999px 999px 999px 35px;
+        }
+
+        .noteBox {
+            position: relative;
+            width: 216px;
+            margin: 10px;
+            padding: 0;
+            border: 1px solid #ccc;
+        }
+
+        .button {
+            display: block;
+            box-sizing: content-box;
+            width: 200px;
+            padding: 8px;
+            margin: 0 10px 20px 10px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            clear: both;
+        }
+
+        .button:hover {
+            background-color: black;
+            color: white;
+            border-color: black;
+        }
+
+        .top {
+            text-align: right;
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: space-between;
+            padding: 15px 10px;
+            margin-bottom: 0.5em;
+        }
+
+        .content {
+            padding: 10px;
+        }
+
+        .close {
+            text-align: right;
+            height: 10px;
+            width: 10px;
+            position: relative;
+            box-sizing: border-box;
+            line-height: 10px;
+            display: inline-block;
+        }
+
+        .close:before,
+        .close:after {
+            transform: rotate(-45deg);
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -1px;
+            margin-left: -5px;
+            display: block;
+            height: 2px;
+            width: 10px;
+            background-color: black;
+            transition: all 0.25s ease-out;
+        }
+
+        .close:after {
+            transform: rotate(-135deg);
+        }
+
+        .close:hover:before,
+        .close:hover:after {
+            transform: rotate(0deg);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <header>
+            <a @click="downloadNote">📋</a>
+            <h2>{{ title }}</h2>
+            <input type="color" id="favcolor" name="favcolor" v-model="note.color">
+        </header>
+
+        <textarea autofocus placeholder="insert your note .." v-model="note.text"
+            @keyup.ctrl.enter="addNote"></textarea>
+        <button class="button" @click="addNote">Submit</button>
+
+
+        <div v-for="(note, index) in notes" class="noteBox">
+            <div class="top" :style="{ 'background-color': note.color }">
+                <button class="close" @click="removeNote(index)"></button>
+                <i>{{ note.date }}</i>
+            </div>
+            <div class="content">
+                {{ note.text }}
+            </div>
+        </div>
+    </div>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                title: 'Minimal Notes',
+                note: {
+                    text: '',
+                    date: '',
+                    color: '#fecf28'
+                },
+                notes: [{
+                    text: 'Minimal Notes',
+                    date: new Date(Date.now()).toLocaleString(),
+                    color: '#fecf28'
+                }]
+            },
+            methods: {
+                addNote() {
+                    let { text, date, color } = this.note;
+                    this.notes.push({
+                        text,
+                        date: new Date(Date.now()).toLocaleString(),
+                        color
+                    });
+                    this.note.text = '';
+                },
+                removeNote(index) {
+                    this.$delete(this.notes, index);
+                },
+                downloadNote() {
+                    var json = [JSON.stringify(this.notes)];
+                    var file = new Blob(json, { type: "application/json;charset=utf-8" });
+
+                    // Check the Browser.
+                    var isIE = false || !!document.documentMode;
+                    if (isIE) {
+                        window.navigator.msSaveBlob(file, "Minimal-Notes.json");
+                    } else {
+                        var url = window.URL || window.webkitURL;
+                        link = url.createObjectURL(file);
+                        var a = document.createElement("a");
+                        a.download = "Minimal-Notes.json";
+                        a.href = link;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    }
+                }
+            },
+            mounted() {
+                if (localStorage.getItem('notes')) this.notes = JSON.parse(localStorage.getItem('notes'));
+            },
+            watch: {
+                notes: {
+                    handler() {
+                        localStorage.setItem('notes', JSON.stringify(this.notes));
+                    },
+                    deep: true,
+                },
+            }
+        })
+    </script>
+</body>
+
+</html>
