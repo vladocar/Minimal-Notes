@@ -157,6 +157,9 @@
                     let {
                         text, title, color
                     } = this.note
+                    if (text === '') {
+                       return;
+                    }
                     this.notes.push({
                         text,
                         date: new Date(Date.now()).toLocaleString(),
